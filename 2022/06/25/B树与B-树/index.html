@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.8.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.8.0" type="image/png" sizes="32x32"><meta name="description" content="B树与B+树的特点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="B树与B+树">
+<meta property="og:url" content="http://zjblog.github.io/2022/06/25/B%E6%A0%91%E4%B8%8EB-%E6%A0%91/index.html">
+<meta property="og:site_name" content="陪我去看海吧">
+<meta property="og:description" content="B树与B+树的特点">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://zjblog.github.io/images/b-tree.png">
+<meta property="og:image" content="http://zjblog.github.io/images/b-insert.png">
+<meta property="og:image" content="http://zjblog.github.io/images/b+-tree.png">
+<meta property="article:published_time" content="2022-06-25T02:01:45.000Z">
+<meta property="article:modified_time" content="2022-06-25T03:05:31.000Z">
+<meta property="article:author" content="Zhongjing">
+<meta property="article:tag" content="树">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://zjblog.github.io/images/b-tree.png"><title>B树与B+树 | 陪我去看海吧</title><link ref="canonical" href="http://zjblog.github.io/2022/06/25/B%E6%A0%91%E4%B8%8EB-%E6%A0%91/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.8.0"><link rel="stylesheet" href="css/custom.css"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-solid fa-bars"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-solid fa-hippo"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">只有拼劲全力,才能摆脱失望和后悔的阴影</div><div class="header-banner-info__subtitle">Every day without dancing is a betrayal of life</div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">B树与B+树</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-06-25</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-06-25</span></span></div></header><div class="post-body">
+        <h1 id="B树定义"   >
+          <a href="#B树定义" class="heading-link"><i class="fas fa-link"></i></a><a href="#B树定义" class="headerlink" title="B树定义"></a>B树定义</h1>
+      <p>二叉树是二分树，多分树是二叉树的推广。多分树主要适用于静态的索引数据文件，在插入和删除的时候需要把插入位置之后的每个记录都要向后移动，从而导致增加新的索引项和索引页块，需要对外存上的页块进行大量的调整。因此对于经常需要插入和删除的动态索引顺序文件，使用多分树并不合适，需要采用动态索引结构，即B树和B+树。<br>B树是一种自平衡树，是AVL树的一般化，它维护有序数据并允许以对数时间进行搜索，顺序访问，插入和删除。与AVL树不同的是，B树非常适合读取和写入相对较大的数据块（如光盘）的存储系统。它通常用于数据库和文件系统。</p>
+<p>一颗m阶的B树满足如下条件：</p>
+<pre><code>每个节点最多只有m个子节点。
+除根节点外，每个非叶子节点具有至少有 m/2（向下取整）个子节点。
+非叶子节点的根节点至少有两个子节点。
+有k颗子树的非叶节点有k-1个键，键按照递增顺序排列。
+叶节点都在同一层中。
+</code></pre>
+<p><img src="/images/b-tree.png" alt="B树"></p>
+<p>（1）什么是B树的阶 ？<br>B树中一个节点的子节点数目的最大值，用m表示，假如最大值为4，则为4阶，如图，所有节点中，节点[13,16,19]拥有的子节点数目最多，四个子节点（灰色节点），所以可以定义上面的图片为4阶B树。</p>
+<p>（2）什么是根节点 ？<br>节点【10】即为根节点，特征：根节点拥有的子节点数量的上限和内部节点相同，如果根节点不是树中唯一节点的话，至少有俩个子节点（不然就变成单支了）。在m阶B树中（根节点非树中唯一节点），那么有关系式2&lt;&#x3D; M &lt;&#x3D;m，M为子节点数量；包含的元素数量 1&lt;&#x3D; K &lt;&#x3D;m-1,K为元素数量。</p>
+<p>（3）什么是内部节点 ？<br>节点【13,16,19】、节点【3,6】都为内部节点，特征：内部节点是除叶子节点和根节点之外的所有节点，拥有父节点和子节点。假定m阶B树的内部节点的子节点数量为M，则一定要符合（m&#x2F;2）&lt;&#x3D; M &lt;&#x3D;m关系式，包含元素数量M-1；包含的元素数量 （m&#x2F;2）-1&lt;&#x3D; K &lt;&#x3D;m-1,K为元素数量。m&#x2F;2向上取整。1.2 B树出现的目的</p>
+
+        <h2 id="B树插入数据"   >
+          <a href="#B树插入数据" class="heading-link"><i class="fas fa-link"></i></a><a href="#B树插入数据" class="headerlink" title="#B树插入数据"></a>#B树插入数据</h2>
+      <p>1.3.2 插入</p>
+<p>针对m阶高度h的B树，插入一个元素时，首先在B树中是否存在，如果不存在，即在叶子结点处结束，然后在叶子结点中插入该新的元素。</p>
+<pre><code>若该节点元素个数小于m-1，直接插入；
+若该节点元素个数等于m-1，引起节点分裂；以该节点中间元素为分界，取中间元素（偶数个数，中间两个随机选取）插入到父节点中；
+重复上面动作，直到所有节点符合B树的规则；最坏的情况一直分裂到根节点，生成新的根节点，高度增加1。
+</code></pre>
+<p><img src="/images/b-insert.png" alt="B树"></p>
+<p>1.3、B树的作用</p>
+<p>B树的出现是为了弥补不同的存储级别之间的访问速度上的巨大差异，实现高效的 I&#x2F;O。平衡二叉树的查找效率是非常高的，并可以通过降低树的深度来提高查找的效率。但是当数据量非常大，树的存储的元素数量是有限的，这样会导致二叉查找树结构由于树的深度过大而造成磁盘I&#x2F;O读写过于频繁，进而导致查询效率低下。另外数据量过大会导致内存空间不够容纳平衡二叉树所有结点的情况。B树是解决这个问题的很好的结构。</p>
+
+        <h1 id="B-树的定义"   >
+          <a href="#B-树的定义" class="heading-link"><i class="fas fa-link"></i></a><a href="#B-树的定义" class="headerlink" title="B+树的定义"></a>B+树的定义</h1>
+      <p>一颗m阶的B+树满足如下条件：</p>
+<ul>
+<li>每个节点最多只有m个子节点。</li>
+<li>除根节点外，每个非叶子节点具有至少有 m&#x2F;2（向下取整）个子节点。</li>
+<li>非叶子节点的根节点至少有两个子节点。</li>
+<li>有k颗子树的非叶节点有k个键，键按照递增顺序排列。</li>
+<li>叶节点都在同一层中。<br> <img src="/images/b+-tree.png" alt="B树"></li>
+</ul>
+<p>每个叶节点中至少包含 m&#x2F;2（向下取整）个关键码，所有主文件记录的索引项都存放在B+树的叶节点中。所有内部节点都看成是索引的索引。节点中仅包含它的各个子节点中最大（或最小）关键码的分界值以及指向子节点的指针。 </p>
+
+        <h5 id="B-树的检索、插入和删除"   >
+          <a href="#B-树的检索、插入和删除" class="heading-link"><i class="fas fa-link"></i></a><a href="#B-树的检索、插入和删除" class="headerlink" title="B+树的检索、插入和删除"></a>B+树的检索、插入和删除</h5>
+      <p>检索<br>在B+树中检索关键码key的方法与B树的检索方式相似，但若在内部节点中找到检索的关键码时，检索并不会结束，要继续找到B+树的叶子结点为止。<br>插入<br>与B树的插入操作相似，总是插到叶子结点上。当叶节点中原关键码的个数等于m时，该节点分裂成两个节点，分别使关键码的个数为 (m+1)&#x2F;2 （向上取整）和 (m+1)&#x2F;2 （向下取整）。<br>删除<br>仅在叶节点删除关键码。若因为删除操作使得节点中关键码数少于 m&#x2F;2（向下取整）时，则需要调整或者和兄弟节点合并。合并的过程和B树类似，区别是父节点中作为分界的关键码不放入合并后的节点中。</p>
+
+        <h1 id="B树与B-树的差异"   >
+          <a href="#B树与B-树的差异" class="heading-link"><i class="fas fa-link"></i></a><a href="#B树与B-树的差异" class="headerlink" title="B树与B+树的差异"></a>B树与B+树的差异</h1>
+      <p>每个叶节点中至少包含 m&#x2F;2（向下取整）个关键码，所有主文件记录的索引项都存放在B+树的叶节点中。所有内部节点都看成是索引的索引。节点中仅包含它的各个子节点中最大（或最小）关键码的分界值以及指向子节点的指针。 </p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="http://zjblog.github.io">Zhongjing</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="http://zjblog.github.io/2022/06/25/B%E6%A0%91%E4%B8%8EB-%E6%A0%91/">http://zjblog.github.io/2022/06/25/B%E6%A0%91%E4%B8%8EB-%E6%A0%91/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://zjblog.github.io/tags/%E6%A0%91/">树</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2022/07/11/%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">两数之和</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2022/06/23/world/"><span class="paginator-prev__text">Hello,world!</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#B%E6%A0%91%E5%AE%9A%E4%B9%89"><span class="toc-number">1.</span> <span class="toc-text">
+          B树定义</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#B%E6%A0%91%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="toc-number">1.1.</span> <span class="toc-text">
+          #B树插入数据</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#B-%E6%A0%91%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">2.</span> <span class="toc-text">
+          B+树的定义</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#B-%E6%A0%91%E7%9A%84%E6%A3%80%E7%B4%A2%E3%80%81%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-number">2.0.0.0.1.</span> <span class="toc-text">
+          B+树的检索、插入和删除</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#B%E6%A0%91%E4%B8%8EB-%E6%A0%91%E7%9A%84%E5%B7%AE%E5%BC%82"><span class="toc-number">3.</span> <span class="toc-text">
+          B树与B+树的差异</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/girl.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">zj</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">3</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">3</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">3</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2023</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Zhongjing</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.8.0"></script><script src="/js/stun-boot.js?v=2.8.0"></script><script src="/js/scroll.js?v=2.8.0"></script><script src="/js/header.js?v=2.8.0"></script><script src="/js/sidebar.js?v=2.8.0"></script></body></html>
